@@ -33,8 +33,8 @@ public class GroqExtractionService : IAiExtractionService
             ?? throw new InvalidOperationException("Groq:ApiKey is not configured.");
 
         // Read model from config or fallback to a standard supported model
-        var model = _configuration["Groq:Model"] ?? "llama-3.3-70b-versatile";
-
+        var model = _configuration["Groq:Model"] ?? "openai/gpt-oss-120b";
+        
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", apiKey);
 
