@@ -51,18 +51,18 @@ public static class DependencyInjection
         {
             var config = sp.GetRequiredService<IConfiguration>();
 
-            var accessKey = config["R2:AccessKeyId"];
-            var secretKey = config["R2:SecretAccessKey"];
             var serviceUrl = config["R2:ServiceUrl"] 
                 ?? $"https://{config["R2:AccountId"]}.r2.cloudflarestorage.com";
+            var accessKey = config["R2:AccessKeyId"];
+            var secretKey = config["R2:SecretAccessKey"];
 
-            return new AmazonS3Client(
-                new BasicAWSCredentials(accessKey, secretKey),
-                new AmazonS3Config
-                {
-                    ServiceURL = serviceUrl,
-                    ForcePathStyle = true
-                });
+            var s3Config = new AmazonS3Config
+            {
+                ServiceURL = serviceUrl,
+                ForcePathStyle = true // Fixes Supabase S3 SSL handshake failure
+            };
+
+            return new AmazonS3Client(accessKey, secretKey, s3Config);
         });
 
         // Repositories

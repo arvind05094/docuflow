@@ -32,6 +32,9 @@ public class GroqExtractionService : IAiExtractionService
         var apiKey = _configuration["Groq:ApiKey"]
             ?? throw new InvalidOperationException("Groq:ApiKey is not configured.");
 
+        // Read model from config or fallback to a standard supported model
+        var model = _configuration["Groq:Model"] ?? "llama-3.3-70b-versatile";
+
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", apiKey);
 
@@ -39,7 +42,7 @@ public class GroqExtractionService : IAiExtractionService
 
         var payload = new
         {
-            model = "llama-3.1-8b-instant",
+            model = model,
             messages = new[]
             {
                 new { role = "system", content = "You are a document extraction assistant. Extract fields from documents and return only valid JSON array. No markdown, no explanation, only the JSON array." },
