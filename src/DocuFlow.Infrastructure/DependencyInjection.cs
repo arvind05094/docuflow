@@ -47,13 +47,23 @@ public static class DependencyInjection
         var r2AccessKey = configuration["R2:AccessKeyId"];
         var r2SecretKey = configuration["R2:SecretAccessKey"];
 
-        services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(
-            new BasicAWSCredentials(r2AccessKey, r2SecretKey),
-            new AmazonS3Config
-            {
-                ServiceURL = $"https://{r2AccountId}.r2.cloudflarestorage.com",
-                ForcePathStyle = true
-            }));
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+
+            var accessKey = config["R2:AccessKeyId"];
+            var secretKey = config["R2:SecretAccessKey"];
+            var serviceUrl = config["R2:ServiceUrl"] 
+                ?? $"https://{config["R2:AccountId"]}.r2.cloudflarestorage.com";
+
+            return new AmazonS3Client(
+                new BasicAWSCredentials(accessKey, secretKey),
+                new AmazonS3Config
+                {
+                    ServiceURL = serviceUrl,
+                    ForcePathStyle = true
+                });
+        });
 
         // Repositories
         services.AddScoped<IDocumentRepository, DocumentRepository>();
